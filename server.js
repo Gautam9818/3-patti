@@ -3,6 +3,7 @@ const http = require("http");
 const socket = io("https://3-patti-production.up.railway.app");
 const { Server } = require("socket.io");
 const cors = require("cors");
+app.use(cors({ origin: "https://3-patti-production.up.railway.app" }));
 
 const app = express();
 const server = http.createServer(app);
