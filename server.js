@@ -3,19 +3,42 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
-
 const app = express();
 const server = http.createServer(app);
 
-// Enable CORS properly
-app.use(cors({ origin: "https://3-patti-production.up.railway.app" }));
+// ✅ CORS CONFIGURATION
+app.use(cors({
+    origin: "*", // Allow all origins (for development, restrict in production)
+    methods: ["GET", "POST"]
+}));
 
 const io = new Server(server, {
     cors: {
-        origin: "https://3-patti-production.up.railway.app",
-        methods: ["GET", "POST"]
+        origin: "*", // Replace with your Netlify frontend URL in production
+        methods: ["GET", "POST"],
+        transports: ["websocket", "polling"] // ✅ Ensure WebSocket & polling support
     }
 });
+
+io.on("connection", (socket) => {
+    console.log(`Player connected: ${socket.id}`);
+
+    socket.on("startGame", () => {
+        console.log("Game started!");
+        io.emit("gameStarted", "Game has started!");
+    });
+
+    socket.on("disconnect", () => {
+        console.log(`Player disconnected: ${socket.id}`);
+    });
+});
+
+// ✅ Ensure Railway is using port 8080
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
 
 const suits = ["♠", "♥", "♦", "♣"];
 const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -93,9 +116,5 @@ function determineWinner() {
     io.emit("winner", winner);
 }
 
-// Start Server
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+
 
