@@ -10,19 +10,23 @@
 <body>
     <h1>Teen Patti Online</h1>
     <h2 id="status">Waiting for players...</h2>
+    <button id="startGame">Start Game</button> <!-- ✅ Added Start Button -->
     
     <div id="playersContainer"></div>
     <h2 id="winner"></h2>
 
     <script>
-        const socket = io("https://3-patti-production.up.railway.app/", { transports: ["websocket", "polling"] });
+        // ✅ Connect to the backend (Make sure Railway backend is running)
+        const socket = io("https://3-patti-production.up.railway.app", { transports: ["websocket", "polling"] });
 
         let myId = "";
 
+        // ✅ When connected, get your socket ID
         socket.on("connect", () => {
             myId = socket.id;
         });
 
+        // ✅ Update players list when someone joins/leaves
         socket.on("updatePlayers", (players) => {
             document.getElementById("status").innerText = `${players.length} players connected`;
             const container = document.getElementById("playersContainer");
@@ -36,6 +40,7 @@
             });
         });
 
+        // ✅ Listen for "startGame" event
         socket.on("startGame", (players) => {
             document.getElementById("status").innerText = "Game Started!";
             players.forEach(player => {
@@ -45,6 +50,21 @@
                     `<div class="card">${card.rank}${card.suit}</div>`
                 ).join("");
             });
+        });
+
+        // ✅ Listen for "winner" event and display winner
+        socket.on("winner", (winner) => {
+            document.getElementById("winner").innerText = `${winner} Wins!`;
+        });
+
+        // ✅ Handle errors from the server
+        socket.on("errorMessage", (msg) => {
+            alert(msg);
+        });
+
+        // ✅ Add Start Game Button Functionality
+        document.getElementById("startGame").addEventListener("click", () => {
+            socket.emit("startGame");
         });
     </script>
 </body>
