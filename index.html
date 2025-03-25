@@ -17,8 +17,22 @@
 
     <script>
         // ✅ Connect to the backend (Make sure Railway backend is running)
-        const socket = io("https://3-patti-production.up.railway.app:8080", { transports: ["websocket", "polling"] });
+        const socket = io("https://3-patti-production.up.railway.app", {
+    transports: ["websocket", "polling"], // ✅ Ensure WebSockets work
+    secure: true
+});
 
+socket.on("connect", () => {
+    console.log("Connected to backend:", socket.id);
+});
+
+socket.on("gameStarted", (message) => {
+    console.log(message);
+});
+
+document.getElementById("startGame").addEventListener("click", () => {
+    socket.emit("startGame");
+});
 
 
 
@@ -69,6 +83,12 @@
         document.getElementById("startGame").addEventListener("click", () => {
             socket.emit("startGame");
         });
+
+
+
+
+
+        
     </script>
 </body>
 </html>
