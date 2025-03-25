@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teen Patti Online</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Teen Patti Online</h1>
+    <h2 id="status">Waiting for players...</h2>
+    
+    <div id="playersContainer"></div>
+    <h2 id="winner"></h2>
+
+    <script>
+        const socket = io("http://localhost:3000");
+        let myId = "";
+
+        socket.on("connect", () => {
+            myId = socket.id;
+        });
+
+        socket.on("updatePlayers", (players) => {
+            document.getElementById("status").innerText = `${players.length} players connected`;
+            const container = document.getElementById("playersContainer");
+            container.innerHTML = "";
+
+            players.forEach(player => {
+                const playerDiv = document.createElement("div");
+                playerDiv.classList.add("player");
+                playerDiv.innerHTML = `<h2>Player ${player.id}</h2><div class="cards" id="player-${player.id}"></div>`;
+                container.appendChild(playerDiv);
+            });
+        });
+
+        socket.on("startGame", (players) => {
+            document.getElementById("status").innerText = "Game Started!";
+            players.forEach(player => {
+                const cardContainer = document.getElementById(`player-${player.id}`);
+                if (!cardContainer) return;
+                cardContainer.innerHTML = player.cards.map(card => 
+                    `<div class="card">${card.rank}${card.suit}</div>`
+                ).join("");
+            });
+        });
+    </script>
+</body>
+</html>
