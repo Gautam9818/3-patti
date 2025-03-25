@@ -1,5 +1,6 @@
 const express = require("express");
 const http = require("http");
+const socket = io("https://3-patti-production.up.railway.app");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
