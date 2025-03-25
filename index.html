@@ -5,25 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teen Patti Online</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Teen Patti Online</h1>
     <h2 id="status">Waiting for players...</h2>
+    <button id="startGame">Start Game</button>
     
     <div id="playersContainer"></div>
     <h2 id="winner"></h2>
 
     <script>
-        // 🚀 UPDATE THIS with your actual Railway backend URL!
-        const socket = io("https://your-app.up.railway.app", { transports: ["websocket"] });
-
+        const socket = io("https://your-railway-backend-url.up.railway.app"); // 🔥 Change to your Railway backend URL
         let myId = "";
 
         socket.on("connect", () => {
             myId = socket.id;
-            console.log("Connected as", myId);
         });
 
         socket.on("updatePlayers", (players) => {
@@ -39,6 +36,10 @@
             });
         });
 
+        document.getElementById("startGame").addEventListener("click", () => {
+            socket.emit("startGame");
+        });
+
         socket.on("startGame", (players) => {
             document.getElementById("status").innerText = "Game Started!";
             players.forEach(player => {
@@ -50,9 +51,12 @@
             });
         });
 
-        socket.on("disconnect", () => {
-            console.log("Disconnected from server.");
-            document.getElementById("status").innerText = "Disconnected. Refresh to reconnect.";
+        socket.on("winner", (winner) => {
+            document.getElementById("winner").innerText = `${winner} Wins!`;
+        });
+
+        socket.on("errorMessage", (msg) => {
+            alert(msg);
         });
     </script>
 </body>
