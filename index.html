@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teen Patti Online</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,11 +16,14 @@
     <h2 id="winner"></h2>
 
     <script>
-        const socket = io("http://localhost:3000");
+        // 🚀 UPDATE THIS with your actual Railway backend URL!
+        const socket = io("https://your-app.up.railway.app", { transports: ["websocket"] });
+
         let myId = "";
 
         socket.on("connect", () => {
             myId = socket.id;
+            console.log("Connected as", myId);
         });
 
         socket.on("updatePlayers", (players) => {
@@ -44,6 +48,11 @@
                     `<div class="card">${card.rank}${card.suit}</div>`
                 ).join("");
             });
+        });
+
+        socket.on("disconnect", () => {
+            console.log("Disconnected from server.");
+            document.getElementById("status").innerText = "Disconnected. Refresh to reconnect.";
         });
     </script>
 </body>
