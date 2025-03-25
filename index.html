@@ -10,13 +10,13 @@
 <body>
     <h1>Teen Patti Online</h1>
     <h2 id="status">Waiting for players...</h2>
-    <button id="startGame">Start Game</button>
     
     <div id="playersContainer"></div>
     <h2 id="winner"></h2>
 
     <script>
-        const socket = io("https://your-railway-backend-url.up.railway.app"); // 🔥 Change to your Railway backend URL
+        const socket = io("https://3-patti-production.up.railway.app/", { transports: ["websocket", "polling"] });
+
         let myId = "";
 
         socket.on("connect", () => {
@@ -36,10 +36,6 @@
             });
         });
 
-        document.getElementById("startGame").addEventListener("click", () => {
-            socket.emit("startGame");
-        });
-
         socket.on("startGame", (players) => {
             document.getElementById("status").innerText = "Game Started!";
             players.forEach(player => {
@@ -49,14 +45,6 @@
                     `<div class="card">${card.rank}${card.suit}</div>`
                 ).join("");
             });
-        });
-
-        socket.on("winner", (winner) => {
-            document.getElementById("winner").innerText = `${winner} Wins!`;
-        });
-
-        socket.on("errorMessage", (msg) => {
-            alert(msg);
         });
     </script>
 </body>
