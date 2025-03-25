@@ -17,7 +17,8 @@
 
     <script>
         // ✅ Connect to the backend (Make sure Railway backend is running)
-        const socket = io("https://3-patti-production.up.railway.app:8080", { transports: ["websocket", "polling"] });
+        const socket = io("https://3-patti-production.up.railway.app", { transports: ["websocket", "polling"] });
+
 
 
         let myId = "";
