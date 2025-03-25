@@ -1,15 +1,17 @@
 const express = require("express");
 const http = require("http");
-const socket = io("https://3-patti-production.up.railway.app");
 const { Server } = require("socket.io");
 const cors = require("cors");
-app.use(cors({ origin: "https://3-patti-production.up.railway.app" }));
 
 const app = express();
 const server = http.createServer(app);
+
+// Enable CORS properly
+app.use(cors({ origin: "https://3-patti-production.up.railway.app" }));
+
 const io = new Server(server, {
     cors: {
-        origin: "*", // ✅ Allows all origins (Netlify frontend can connect)
+        origin: "https://3-patti-production.up.railway.app",
         methods: ["GET", "POST"]
     }
 });
@@ -40,12 +42,10 @@ function shuffleDeck() {
 // Handle Player Connection
 io.on("connection", (socket) => {
     console.log(`Player connected: ${socket.id}`);
-
     players.push({ id: socket.id, cards: [] });
 
     io.emit("updatePlayers", players);
 
-    // Start Game
     socket.on("startGame", () => {
         if (players.length < 2 || players.length > 5) {
             io.emit("errorMessage", "Game needs 2 to 5 players.");
@@ -53,7 +53,6 @@ io.on("connection", (socket) => {
         }
 
         createDeck();
-
         players.forEach(player => {
             player.cards = deck.splice(0, 3);
         });
@@ -62,7 +61,6 @@ io.on("connection", (socket) => {
         determineWinner();
     });
 
-    // Handle Player Disconnection
     socket.on("disconnect", () => {
         players = players.filter(player => player.id !== socket.id);
         io.emit("updatePlayers", players);
@@ -99,3 +97,4 @@ const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
